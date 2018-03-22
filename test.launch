@@ -5,6 +5,7 @@
                 name="gazebo"
                 args="world.sdf">
                 <env name="GAZEBO_RESOURCE_PATH" value="GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/bob/gazebo_odom_plugin"/>
+		<env name="GAZEBO_PLUGIN_PATH" value="/home/bob/gazebo_odom_plugin/robot/plugins/build"/>
 
         </node>
 

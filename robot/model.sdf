@@ -3,6 +3,9 @@
 
         <model name="robot">
         <static>false</static>
+
+
+	<plugin name="odom" filename="libodom.so"/>
           <link name='base_link'>
             <inertial> 
               <mass>1.0</mass> 
