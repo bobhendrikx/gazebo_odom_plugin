@@ -1,0 +1,11 @@
+<launch>
+        <node
+                pkg="gazebo_ros"
+                type="gazebo"
+                name="gazebo"
+                args="world.sdf">
+                <env name="GAZEBO_RESOURCE_PATH" value="GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/bob/gazebo_odom_plugin"/>
+
+        </node>
+
+</launch>
