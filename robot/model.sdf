@@ -2,13 +2,13 @@
       <sdf version='1.4'>
 
         <model name="robot">
-        <static>false</static>
+        <static>true</static>
 
 
 
 
         <plugin name="odom" filename="libodom.so">
-            <vel>1</vel>
+            <vel>0</vel>
         </plugin>
           <link name='base_link'>
             <inertial> 
