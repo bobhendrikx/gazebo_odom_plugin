@@ -1,37 +1,47 @@
   <?xml version='1.0'?>
-      <sdf version='1.4'>
+  <sdf version='1.4'>
 
-        <model name="robot">
-        <static>true</static>
-
-
+    <model name="robot">
+      <static>false</static>
 
 
-        <plugin name="odom" filename="libodom.so">
-            <vel>0</vel>
-        </plugin>
-          <link name='base_link'>
-            <inertial> 
-              <mass>1.0</mass> 
-            </inertial>
 
-            <collision name='collision'>
-              <pose>0 0 1 0 0 0</pose>
-              <geometry>
-                <box>
-                  <size>1 1 1</size>
-                </box>
-              </geometry>
-            </collision>
 
-            <visual name='visual'>
-              <pose>0 0 1 0 0 0</pose>
-              <geometry>
-                <box>
-                  <size>1 1 1</size>
-                </box>
-              </geometry>
-            </visual>
-          </link>
-      </model>
-    </sdf>
+      <plugin name="odom" filename="libodom.so">
+        <vel>0</vel>
+      </plugin>
+
+      <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+        <commandTopic>cmd_vel</commandTopic>
+        <odometryTopic>odom_donotuse</odometryTopic>
+        <!--odometryFrame>odom</odometryFrame-->
+        <odometryRate>20.0</odometryRate>
+        <robotBaseFrame>base_link</robotBaseFrame>
+      </plugin>
+
+
+      <link name='base_link'>
+        <inertial> 
+          <mass>1.0</mass> 
+        </inertial>
+
+        <collision name='collision'>
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </sdf>
