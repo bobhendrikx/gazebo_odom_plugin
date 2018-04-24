@@ -13,6 +13,9 @@ om_true =
 
 ## Odometry uncertainty
 
-
+TODO: 
+check velocity error noise, static only?
+what update rate should be used for velocity comm?
+How do we buffer the velocity commands? buffer latest and async read this with mutex in update hook?
 
 
