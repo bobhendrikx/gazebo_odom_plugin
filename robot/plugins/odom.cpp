@@ -63,6 +63,9 @@ public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // Called by the world update start event
 public: void OnUpdate()
     {
+	//First handle callbacks to change velocity if a command has arrived
+	ros::spinOnce();
+	
         // Apply a small linear velocity to the model.
         //this->model->SetAngularVel(ignition::math::Vector3d(0, 0, this->vel));
         //this->model->SetLinearVel(ignition::math::Vector3d(0, 0, 0));
@@ -112,7 +115,7 @@ public: void asyncPublish()
   deltarot1 = 0;
   //Calculate odometry difference
   // Mind the small positive number, it causes the odom to flip because suddenly angles of pi are registered
-  std::cout << " epsilon =  " << std::sqrt(std::pow(this->pose.pos.x - truepose_old.x,2)+ std::pow(this->pose.pos.y - truepose_old.y,2)) << std::endl;
+  //std::cout << " epsilon =  " << std::sqrt(std::pow(this->pose.pos.x - truepose_old.x,2)+ std::pow(this->pose.pos.y - truepose_old.y,2)) << std::endl;
   if( std::sqrt(std::pow(this->pose.pos.x - truepose_old.x,2)+ std::pow(this->pose.pos.y - truepose_old.y,2)) > 0.001){
    deltarot1 = std::atan2(this->pose.pos.y - truepose_old.y,this->pose.pos.x - this->truepose_old.x) - truepose_old.z;
    deltatrans = std::sqrt(std::pow(this->pose.pos.x - truepose_old.x,2)+ std::pow(this->pose.pos.y - truepose_old.y,2));
@@ -123,7 +126,7 @@ public: void asyncPublish()
   }
   deltarot2 = this->pose.rot.GetYaw() - deltarot1 - truepose_old.z;
   
-  std::cout << "dr1: " << deltarot1 << "  dr2: " << deltarot2 << "  dtr: " << deltatrans << std::endl;
+  //std::cout << "dr1: " << deltarot1 << "  dr2: " << deltarot2 << "  dtr: " << deltatrans << std::endl;
   
   double noise = 0.0;
   //Add noise to delta values
