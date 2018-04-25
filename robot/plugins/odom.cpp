@@ -41,7 +41,9 @@ public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 	ros::init(argc,argv,"gazebo_odom");
 	ros::NodeHandle n;
 	
-	this->odompub = n.advertise<nav_msgs::Odometry>("odom_drifted", 1);
+	this->odompub = n.advertise<nav_msgs::Odometry>("odom_drifted", 1,velocityCallback);
+	
+	this->velsub = n.subscribe("/cmd_vel",1,velocityCallback);
 	
 	//Initialize the drifted odom transform to zero
 	this->odomdrifted.x = 0;
@@ -80,6 +82,12 @@ public: void OnUpdate()
 	//msg.data = pose.pos.z;
 	//odompub.publish(msg);
     }
+    
+   
+public: static void velocityCallback(geometry_msgs::Twist::ConstPtr ptr)
+{
+  std::cout << "Velocity callback was called" << std::endl;
+}
     
 public: void asyncPublish()
 {
@@ -168,6 +176,7 @@ private: std::mutex mu;
 //private: static ros::Rate rate;
 
 private: ros::Publisher odompub;
+private: ros::Subscriber velsub;
 
     // Pointer to the model
 private: physics::ModelPtr model;
