@@ -11,13 +11,16 @@
         <vel>0</vel>
       </plugin>
 
+     <!--
       <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
         <commandTopic>cmd_vel</commandTopic>
         <odometryTopic>odom_donotuse</odometryTopic>
-        <!--odometryFrame>odom</odometryFrame-->
+        odometryFrame>odom</odometryFrame
         <odometryRate>20.0</odometryRate>
         <robotBaseFrame>base_link</robotBaseFrame>
       </plugin>
+     -->
+     
 
 
       <link name='base_link'>

@@ -34,16 +34,16 @@ public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         sdf::ElementPtr e = _sdf->GetElement("vel");
         sdf::ParamPtr p  = e->GetValue();
         this->vel = std::stod(p->GetAsString());
-        std::cout << "VALUE OF THE VEL FIELD" << this->vel << std::endl;
+        //std::cout << "VALUE OF THE VEL FIELD" << this->vel << std::endl;
 	
 	int argc = 0;
 	char** argv;
 	ros::init(argc,argv,"gazebo_odom");
 	ros::NodeHandle n;
 	
-	this->odompub = n.advertise<nav_msgs::Odometry>("odom_drifted", 1,velocityCallback);
+	this->odompub = n.advertise<nav_msgs::Odometry>("odom_drifted", 1);
 	
-	this->velsub = n.subscribe("/cmd_vel",1,velocityCallback);
+	this->velsub = n.subscribe("/cmd_vel",1, &OdomDriftPlugin::velocityCallback,this);
 	
 	//Initialize the drifted odom transform to zero
 	this->odomdrifted.x = 0;
@@ -55,6 +55,10 @@ public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 	this->truepose_old.y = 0;
 	this->truepose_old.z = 0;
 	
+	this->velcmd.x = 0;
+	this->velcmd.y = 0;
+	this->velcmd.z = 0;
+	
 		
 	//This thread object may not go out of scope say the C++ bosses
 	this->thread = std::thread(&OdomDriftPlugin::asyncPublish,this);
@@ -65,6 +69,12 @@ public: void OnUpdate()
     {
 	//First handle callbacks to change velocity if a command has arrived
 	ros::spinOnce();
+	
+	//transform to model frame and apply
+	double theta = this->model->GetWorldPose().rot.GetAsEuler().z;
+	this->model->SetLinearVel(ignition::math::Vector3d(std::cos(theta)*this->velcmd.x,std::sin(theta)*this->velcmd.x,0));
+	this->model->SetAngularVel(ignition::math::Vector3d(0,0,this->velcmd.z));
+	std::cout << theta << std::endl;
 	
         // Apply a small linear velocity to the model.
         //this->model->SetAngularVel(ignition::math::Vector3d(0, 0, this->vel));
@@ -87,9 +97,17 @@ public: void OnUpdate()
     }
     
    
-public: static void velocityCallback(geometry_msgs::Twist::ConstPtr ptr)
+public:  void velocityCallback(geometry_msgs::Twist::ConstPtr ptr)
 {
   std::cout << "Velocity callback was called" << std::endl;
+  
+  // Set new velocities in world frame
+  
+  this->velcmd.x = ptr->linear.x;
+  this->velcmd.y = ptr->linear.y;
+  this->velcmd.z = ptr->angular.z;
+  
+  
 }
     
 public: void asyncPublish()
@@ -150,7 +168,7 @@ public: void asyncPublish()
   q.setRPY(0,0,odom.pose.pose.orientation.z);
   transform.setRotation(q);
   
-  std::cout << "x: " << odom.pose.pose.position.x << "  y: " << odom.pose.pose.position.y << "  a: " << odom.pose.pose.orientation.z << std::endl;
+  //std::cout << "x: " << odom.pose.pose.position.x << "  y: " << odom.pose.pose.position.y << "  a: " << odom.pose.pose.orientation.z << std::endl;
   static tf::TransformBroadcaster broadcaster;
   broadcaster.sendTransform(tf::StampedTransform(transform,ros::Time::now(),"odom","base_link_drifted"));
   
@@ -168,6 +186,7 @@ public: void asyncPublish()
 
 private: struct odomdrift {double x; double y; double z;} odomdrifted;
 private: struct odomold {double x; double y; double z;} truepose_old;
+private: struct vel {double x; double y; double z;} velcmd;
 
 public: gazebo::math::Pose pose;
  
